@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a12">
+<title>1 из 8 миллиардов</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0a12;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  touch-action:manipulation;overscroll-behavior:none;color:#e8e8f0;}
+:root{--bg:#0a0a12;--card:#141420;--card2:#1c1c2e;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.16);
+  --text:#e8e8f0;--muted:#7a7a95;--dim:#4a4a60;
+  --gold:#ffc440;--green:#34d399;--red:#f87171;
+  --blue:#60a5fa;--pink:#ec4899;--purple:#a855f7;--cyan:#22d3ee;}
+#app{position:fixed;inset:0;overflow:hidden;background:var(--bg);max-width:500px;margin:0 auto;}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;animation:fadeIn .4s;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* ===== SETUP ===== */
+#setupScreen{
+  background:radial-gradient(circle at 50% 0%, rgba(96,165,250,.12), transparent 50%),#07070d;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);
+  overflow-y:auto;align-items:center;}
+.setup-content{width:100%;max-width:400px;margin:auto;padding:10px 0;}
+.setup-header{text-align:center;margin-bottom:20px;}
+.setup-icon{font-size:52px;line-height:1;margin-bottom:8px;display:block;
+  filter:drop-shadow(0 0 30px rgba(96,165,250,.4));}
+.setup-title{font-size:24px;font-weight:900;letter-spacing:-.02em;line-height:1.15;
+  background:linear-gradient(135deg,#a8d4ff,#fff 40%,#c8b0ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px;}
+.setup-subtitle{font-size:11px;color:var(--muted);line-height:1.5;}
+.setup-section{background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;padding:12px 14px;margin-bottom:10px;}
+.setup-label{font-size:9px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:800;margin-bottom:6px;}
+.setup-options{display:flex;gap:5px;}
+.setup-opt{flex:1;padding:9px 3px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:9px;color:var(--muted);
+  font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;
+  transition:all .15s;display:flex;flex-direction:column;align-items:center;
+  gap:2px;text-align:center;}
+.setup-opt .em{font-size:15px;}
+.setup-opt.active{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.6);
+  color:#a8d4ff;box-shadow:0 0 14px rgba(96,165,250,.2);}
+.setup-opt:active{transform:scale(.96);}
+.setup-birth{width:100%;padding:16px;border:none;border-radius:14px;
+  font-family:inherit;font-size:16px;font-weight:900;cursor:pointer;
+  background:linear-gradient(180deg,#a8d4ff,#60a5fa);color:#04101e;
+  box-shadow:0 8px 30px rgba(96,165,250,.4);
+  transition:transform .1s;margin-top:6px;}
+.setup-birth:active{transform:scale(.97);}
+
+/* ===== LIFE ===== */
+#lifeScreen{background:var(--bg);}
+.life-top{padding:calc(env(safe-area-inset-top,0px) + 6px) 10px 6px;
+  background:rgba(10,10,18,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;}
+.top-id{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.life-flag{font-size:18px;flex-shrink:0;}
+.life-nm{flex:1;min-width:0;}
+.life-name{font-size:12px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.life-meta{font-size:8px;color:var(--muted);margin-top:1px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.top-age{text-align:right;flex-shrink:0;}
+.life-age{font-size:20px;font-weight:900;color:var(--gold);line-height:1;}
+.life-age-lbl{font-size:8px;color:var(--muted);font-weight:700;margin-top:1px;}
+
+.stats-line{display:flex;gap:3px;margin-bottom:4px;}
+.stat-chip{flex:1;display:flex;align-items:center;gap:2px;
+  background:rgba(255,255,255,.03);border-radius:5px;padding:2px 4px;
+  border:1px solid var(--border);}
+.stat-chip .em{font-size:8px;}
+.stat-chip .bar{flex:1;height:3px;background:rgba(0,0,0,.5);border-radius:2px;overflow:hidden;}
+.stat-chip .fill{height:100%;transform-origin:left;transition:transform .4s;border-radius:2px;}
+.stat-chip .fill.h{background:linear-gradient(90deg,#f87171,#fb923c);}
+.stat-chip .fill.s{background:linear-gradient(90deg,#fbbf24,#f59e0b);}
+.stat-chip .fill.k{background:linear-gradient(90deg,#60a5fa,#3b82f6);}
+.stat-chip .fill.r{background:linear-gradient(90deg,#ec4899,#db2777);}
+.stat-chip .v{font-size:7px;font-weight:800;color:var(--muted);min-width:12px;
+  text-align:right;font-variant-numeric:tabular-nums;}
+
+.info-line{display:flex;align-items:center;justify-content:space-between;
+  font-size:9px;color:var(--muted);font-weight:700;padding:0 2px;gap:4px;}
+.info-line .status-tag{padding:2px 7px;border-radius:6px;
+  background:rgba(255,255,255,.06);font-weight:900;color:var(--text);
+  font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:60%;}
+.info-line .money{color:var(--gold);font-weight:900;font-variant-numeric:tabular-nums;
+  white-space:nowrap;}
+
+/* Tabs */
+.life-tabs{display:flex;background:rgba(10,10,18,.96);border-bottom:1px solid var(--border);
+  flex-shrink:0;z-index:9;}
+.life-tab{flex:1;padding:8px 4px;border:none;background:transparent;
+  color:var(--muted);font-family:inherit;font-size:10px;font-weight:800;
+  cursor:pointer;transition:color .15s;position:relative;display:flex;
+  flex-direction:column;align-items:center;gap:1px;}
+.life-tab .em{font-size:14px;}
+.life-tab.active{color:var(--blue);}
+.life-tab.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;
+  height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+
+.life-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 10px;
+  -webkit-overflow-scrolling:touch;}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;animation:fadeIn .25s;}
+
+/* Log */
+.log-item{padding:5px 8px;border-radius:7px;font-size:11px;line-height:1.4;
+  color:#c8c8d8;margin-bottom:3px;border-left:2px solid var(--dim);
+  background:rgba(255,255,255,.02);animation:logIn .25s ease;}
+@keyframes logIn{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+.log-item .age{font-size:8px;font-weight:900;color:var(--muted);margin-bottom:1px;
+  text-transform:uppercase;letter-spacing:.04em;}
+.log-item.good{border-left-color:var(--green);background:rgba(52,211,153,.05);}
+.log-item.bad{border-left-color:var(--red);background:rgba(248,113,113,.05);}
+.log-item.event{border-left-color:var(--purple);background:rgba(168,85,247,.06);}
+.log-item.milestone{border-left-color:var(--gold);background:rgba(255,196,64,.07);}
+.log-item.death{border-left-color:var(--red);background:rgba(248,113,113,.1);font-weight:700;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:30px 16px;color:var(--muted);
+  font-size:12px;line-height:1.5;}
+.empty-state .em{font-size:32px;display:block;margin-bottom:8px;opacity:.5;}
+
+/* Relation / Career panels */
+.panel-card{background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px;margin-bottom:8px;}
+.panel-title{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.07em;font-weight:800;margin-bottom:8px;display:flex;
+  align-items:center;gap:5px;}
+
+.partner-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.partner-avatar{width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:linear-gradient(135deg,var(--pc,#ec4899),rgba(0,0,0,.4));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);}
+.partner-info{flex:1;min-width:0;}
+.partner-name{font-size:14px;font-weight:900;}
+.partner-sub{font-size:10px;color:var(--muted);margin-top:1px;font-weight:600;}
+
+.stat-row{display:flex;justify-content:space-between;padding:4px 0;
+  font-size:11px;border-bottom:1px solid rgba(255,255,255,.05);}
+.stat-row:last-child{border-bottom:none;}
+.stat-row .k{color:var(--muted);font-weight:600;}
+.stat-row .v{color:var(--text);font-weight:800;font-variant-numeric:tabular-nums;}
+
+.love-bar{height:5px;background:rgba(0,0,0,.5);border-radius:3px;overflow:hidden;
+  margin:8px 0;border:1px solid var(--border);}
+.love-fill{height:100%;background:linear-gradient(90deg,#ec4899,#f43f5e);
+  transform-origin:left;transition:transform .4s;border-radius:3px;}
+
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;}
+.action-btn{padding:10px 6px;border:none;border-radius:10px;font-family:inherit;
+  font-size:11px;font-weight:800;cursor:pointer;transition:transform .1s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;}
+.action-btn .em{font-size:15px;}
+.action-btn.primary{background:linear-gradient(180deg,#f9a8d4,#ec4899);color:#2d0716;}
+.action-btn.secondary{background:rgba(255,255,255,.06);color:var(--text);
+  border:1px solid var(--border-hi);}
+.action-btn.danger{background:rgba(248,113,113,.15);color:#fca5a5;
+  border:1px solid rgba(248,113,113,.3);}
+.action-btn.success{background:rgba(52,211,153,.15);color:#6ee7b7;
+  border:1px solid rgba(52,211,153,.3);}
+.action-btn:active{transform:scale(.96);}
+.action-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* Career specific */
+.career-option{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .15s;
+  font-family:inherit;color:var(--text);width:100%;text-align:left;}
+.career-option:active{transform:scale(.98);background:rgba(96,165,250,.1);
+  border-color:rgba(96,165,250,.4);}
+.career-option.current{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4);}
+.career-option:disabled{opacity:.4;cursor:not-allowed;}
+.career-option .co-em{font-size:20px;flex-shrink:0;}
+.career-option .co-info{flex:1;min-width:0;}
+.career-option .co-name{font-size:12px;font-weight:800;}
+.career-option .co-desc{font-size:9px;color:var(--muted);margin-top:2px;}
+.career-option .co-income{font-size:11px;font-weight:900;color:var(--gold);
+  font-variant-numeric:tabular-nums;flex-shrink:0;}
+
+/* Bottom */
+.life-bottom{padding:5px 10px calc(env(safe-area-inset-bottom,0px) + 6px);
+  background:rgba(10,10,18,.96);backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);flex-shrink:0;}
+.focus-row{display:flex;gap:3px;margin-bottom:5px;}
+.focus-btn{flex:1;padding:6px 2px;border:1px solid var(--border);border-radius:9px;
+  background:rgba(255,255,255,.04);color:var(--muted);font-family:inherit;
+  font-size:7px;font-weight:800;cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:1px;}
+.focus-btn .em{font-size:13px;}
+.focus-btn.active{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.6);
+  color:#a8d4ff;}
+.focus-btn:active{transform:scale(.94);}
+.focus-btn:disabled{opacity:.3;}
+
+.controls-row{display:flex;gap:4px;}
+.btn-next{flex:1;padding:11px;border:none;border-radius:11px;
+  font-family:inherit;font-size:13px;font-weight:900;cursor:pointer;
+  background:linear-gradient(180deg,#a8d4ff,#60a5fa);color:#04101e;
+  box-shadow:0 4px 18px rgba(96,165,250,.35);
+  transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.btn-next:active{transform:scale(.97);}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.btn-ctrl{padding:11px 10px;border:1px solid var(--border-hi);border-radius:11px;
+  background:rgba(255,255,255,.06);color:var(--text);font-size:13px;
+  cursor:pointer;transition:transform .1s;display:flex;align-items:center;
+  justify-content:center;min-width:40px;}
+.btn-ctrl:active{transform:scale(.94);background:rgba(255,255,255,.12);}
+.btn-ctrl.active{background:rgba(52,211,153,.2);border-color:rgba(52,211,153,.5);
+  color:#8fffc0;}
+
+.speed-indicator{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(10,10,18,.95);color:var(--gold);font-size:12px;font-weight:900;
+  padding:6px 14px;border-radius:10px;border:1px solid var(--gold);
+  pointer-events:none;opacity:0;transition:opacity .2s;z-index:20;}
+.speed-indicator.show{opacity:1;}
+
+/* Modals */
+.modal-overlay{position:absolute;inset:0;background:rgba(5,5,10,.9);
+  backdrop-filter:blur(10px);z-index:60;display:flex;align-items:flex-end;
+  justify-content:center;padding:16px;animation:fadeIn .25s;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);}
+.modal-card{background:linear-gradient(165deg,#1a1a2e,#0e0e1a);
+  border:1px solid rgba(168,85,247,.4);border-radius:20px;
+  padding:20px 18px;width:100%;max-width:420px;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);
+  animation:slideUp .35s cubic-bezier(.2,1,.3,1);
+  max-height:85vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.modal-icon{font-size:22px;}
+.modal-title{font-size:10px;font-weight:900;color:var(--purple);
+  text-transform:uppercase;letter-spacing:.06em;}
+.modal-text{font-size:13px;line-height:1.5;color:#d8d8e8;margin-bottom:14px;}
+.modal-choices{display:flex;flex-direction:column;gap:7px;}
+.choice-btn{width:100%;padding:12px 14px;text-align:left;
+  background:rgba(255,255,255,.05);border:1px solid var(--border-hi);
+  border-radius:12px;color:var(--text);font-family:inherit;font-size:12px;
+  font-weight:600;line-height:1.4;cursor:pointer;transition:all .15s;}
+.choice-btn:active{transform:scale(.98);background:rgba(168,85,247,.18);border-color:var(--purple);}
+
+/* Education choice */
+.edu-card{background:rgba(255,255,255,.04);border:1px solid var(--border-hi);
+  border-radius:12px;padding:12px;margin-bottom:6px;cursor:pointer;
+  transition:all .15s;width:100%;text-align:left;font-family:inherit;color:var(--text);}
+.edu-card:active{transform:scale(.98);background:rgba(96,165,250,.12);
+  border-color:rgba(96,165,250,.4);}
+.edu-card:disabled{opacity:.4;cursor:not-allowed;}
+.edu-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.edu-em{font-size:20px;}
+.edu-name{font-size:13px;font-weight:800;}
+.edu-cost{font-size:10px;font-weight:800;color:var(--red);margin-left:auto;}
+.edu-details{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* Partner choice */
+.partner-choice{background:rgba(255,255,255,.04);border:1px solid var(--border-hi);
+  border-radius:12px;padding:12px;margin-bottom:6px;cursor:pointer;
+  transition:all .15s;width:100%;text-align:left;font-family:inherit;color:var(--text);}
+.partner-choice:active{transform:scale(.98);background:rgba(236,72,153,.1);
+  border-color:rgba(236,72,153,.5);}
+.pc-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.pc-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  background:linear-gradient(135deg,var(--pc,#ec4899),rgba(0,0,0,.4));}
+.pc-name{font-size:12px;font-weight:800;}
+.pc-stats{display:flex;gap:6px;flex-wrap:wrap;font-size:9px;color:var(--muted);font-weight:700;}
+.pc-stats .st{color:var(--gold);}
+
+/* Question modal */
+.question-card{background:linear-gradient(165deg,#1a1a2e,#0e0e1a);
+  border:1px solid rgba(255,196,64,.4);border-radius:20px;padding:20px 18px;
+  width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.8);}
+.question-label{font-size:10px;font-weight:900;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.question-text{font-size:15px;font-weight:700;line-height:1.4;color:#f0f0f8;margin-bottom:12px;}
+.question-input{width:100%;min-height:70px;padding:10px;border-radius:10px;
+  background:rgba(0,0,0,.3);border:1px solid var(--border-hi);color:var(--text);
+  font-family:inherit;font-size:12px;line-height:1.5;resize:none;outline:none;}
+.question-input:focus{border-color:var(--gold);}
+.question-actions{display:flex;gap:6px;margin-top:10px;}
+.btn-skip{flex:1;padding:10px;border:1px solid var(--border-hi);border-radius:10px;
+  background:rgba(255,255,255,.05);color:var(--muted);font-family:inherit;
+  font-size:12px;font-weight:800;cursor:pointer;}
+.btn-submit{flex:2;padding:10px;border:none;border-radius:10px;
+  background:linear-gradient(180deg,#ffd97a,#ffb940);color:#1a0a05;
+  font-family:inherit;font-size:12px;font-weight:900;cursor:pointer;}
+
+/* Death */
+#deathScreen{background:radial-gradient(circle at 50% 20%, rgba(248,113,113,.08), transparent 50%),#06060c;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 16px);
+  overflow-y:auto;}
+.death-content{width:100%;max-width:400px;margin:auto;text-align:center;padding:8px 0;}
+.death-icon{font-size:52px;margin-bottom:6px;display:block;
+  filter:drop-shadow(0 0 30px rgba(248,113,113,.4));}
+.death-title{font-size:20px;font-weight:900;color:#f0f0f8;margin-bottom:3px;}
+.death-sub{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+.death-summary{background:linear-gradient(165deg,#16162a,#0c0c16);
+  border:1px solid var(--border-hi);border-radius:16px;padding:14px;
+  margin-bottom:12px;text-align:left;}
+.sum-row{display:flex;justify-content:space-between;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-row .k{color:var(--muted);font-weight:600;}
+.sum-row .v{font-weight:800;color:#f0f0f8;font-variant-numeric:tabular-nums;}
+.sum-row .v.gold{color:var(--gold);}
+.final-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px;}
+.fs-box{background:rgba(255,255,255,.04);border-radius:9px;padding:7px;text-align:center;}
+.fs-box .em{font-size:13px;}
+.fs-box .n{font-size:14px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;}
+.fs-box .l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
+.compare-title{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:800;margin:14px 0 6px;text-align:left;}
+.compare-item{display:flex;align-items:center;gap:8px;padding:7px 10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:9px;margin-bottom:4px;font-size:11px;text-align:left;}
+.compare-item.me{background:rgba(255,196,64,.1);border-color:rgba(255,196,64,.4);}
+.compare-item .cf{font-size:13px;flex-shrink:0;}
+.compare-item .ci{flex:1;min-width:0;}
+.compare-item .cn{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.compare-item .cm{font-size:9px;color:var(--muted);margin-top:1px;}
+.compare-item .ca{font-size:11px;font-weight:900;color:var(--gold);
+  font-variant-numeric:tabular-nums;flex-shrink:0;}
+.death-btns{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+.death-btn{width:100%;padding:12px;border:none;border-radius:12px;
+  font-family:inherit;font-size:13px;font-weight:900;cursor:pointer;
+  transition:transform .1s;}
+.death-btn.primary{background:linear-gradient(180deg,#ffd97a,#ffb940);color:#1a0a05;}
+.death-btn.secondary{background:rgba(255,255,255,.07);color:var(--text);
+  border:1px solid var(--border-hi);}
+.death-btn:active{transform:scale(.97);}
+
+.toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(20,20,32,.97);color:var(--text);padding:10px 18px;
+  border-radius:12px;font-size:12px;font-weight:700;z-index:100;
+  border:1px solid var(--gold);box-shadow:0 12px 40px rgba(0,0,0,.7);
+  max-width:80vw;text-align:center;animation:toastAnim 2s forwards;
+  pointer-events:none;}
+@keyframes toastAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.8);}
+  10%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  85%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.95);}}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SETUP -->
+  <div class="screen active" id="setupScreen">
+    <div class="setup-content">
+      <div class="setup-header">
+        <span class="setup-icon">🌍</span>
+        <div class="setup-title">1 из 8 миллиардов</div>
+        <div class="setup-subtitle">Родитесь случайным ребёнком и проживите жизнь — от бомжа до миллиардера, от рабочего до бандита.</div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">Мир</div>
+        <div class="setup-options" id="eraOptions">
+          <button class="setup-opt active" data-era="present"><span class="em">🕐</span><span>Сейчас</span></button>
+          <button class="setup-opt" data-era="past"><span class="em">📜</span><span>Прошлое</span></button>
+          <button class="setup-opt" data-era="future"><span class="em">🚀</span><span>Будущее</span></button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">Как определить страну рождения</div>
+        <div class="setup-options" id="modeOptions">
+          <button class="setup-opt active" data-mode="births"><span class="em">👶</span><span>По рождениям</span></button>
+          <button class="setup-opt" data-mode="population"><span class="em">👥</span><span>По населению</span></button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">Сколько продлится жизнь</div>
+        <div class="setup-options" id="durationOptions">
+          <button class="setup-opt" data-duration="1800"><span class="em">⚡</span><span>30 мин</span></button>
+          <button class="setup-opt active" data-duration="3600"><span class="em">⏱</span><span>1 час</span></button>
+          <button class="setup-opt" data-duration="5400"><span class="em">🐢</span><span>1.5 часа</span></button>
+        </div>
+      </div>
+
+      <button class="setup-birth" id="birthBtn">🎲 Родиться</button>
+    </div>
+  </div>
+
+  <!-- LIFE -->
+  <div class="screen" id="lifeScreen">
+    <div class="life-top">
+      <div class="top-id">
+        <div class="life-flag" id="lifeFlag">🇮🇳</div>
+        <div class="life-nm">
+          <div class="life-name" id="lifeName">—</div>
+          <div class="life-meta" id="lifeMeta">—</div>
+        </div>
+        <div class="top-age">
+          <div class="life-age" id="lifeAge">0</div>
+          <div class="life-age-lbl">лет</div>
+        </div>
+      </div>
+      <div class="stats-line">
+        <div class="stat-chip"><span class="em">❤️</span><div class="bar"><div class="fill h" id="barH"></div></div><span class="v" id="valH">70</span></div>
+        <div class="stat-chip"><span class="em">😊</span><div class="bar"><div class="fill s" id="barS"></div></div><span class="v" id="valS">70</span></div>
+        <div class="stat-chip"><span class="em">📚</span><div class="bar"><div class="fill k" id="barK"></div></div><span class="v" id="valK">20</span></div>
+        <div class="stat-chip"><span class="em">👥</span><div class="bar"><div class="fill r" id="barR"></div></div><span class="v" id="valR">50</span></div>
+      </div>
+      <div class="info-line">
+        <span class="status-tag" id="statusTag">👶 Ребёнок</span>
+        <span class="money" id="moneyVal">0 ₽</span>
+      </div>
+    </div>
+
+    <div class="life-tabs">
+      <button class="life-tab active" data-tab="life"><span class="em">📖</span><span>Жизнь</span></button>
+      <button class="life-tab" data-tab="relations"><span class="em">💕</span><span>Отношения</span></button>
+      <button class="life-tab" data-tab="career"><span class="em">💼</span><span>Карьера</span></button>
+    </div>
+
+    <div class="life-content">
+      <div class="tab-pane active" id="tabLife">
+        <div id="lifeLog"></div>
+      </div>
+      <div class="tab-pane" id="tabRelations">
+        <div id="relationsContent"></div>
+      </div>
+      <div class="tab-pane" id="tabCareer">
+        <div id="careerContent"></div>
+      </div>
+    </div>
+
+    <div class="life-bottom">
+      <div class="focus-row">
+        <button class="focus-btn" data-focus="study"><span class="em">🎓</span><span>Учёба</span></button>
+        <button class="focus-btn" data-focus="work"><span class="em">💼</span><span>Работа</span></button>
+        <button class="focus-btn active" data-focus="health"><span class="em">🏃</span><span>Здоровье</span></button>
+        <button class="focus-btn" data-focus="family"><span class="em">👨‍👩‍👧</span><span>Семья</span></button>
+        <button class="focus-btn" data-focus="rest"><span class="em">🎉</span><span>Отдых</span></button>
+      </div>
+      <div class="controls-row">
+        <button class="btn-next" id="nextYearBtn">▶ Прожить год</button>
+        <button class="btn-ctrl" id="pauseBtn">⏸</button>
+        <button class="btn-ctrl" id="speedBtn">1×</button>
+        <button class="btn-ctrl" id="autoBtn">🤖</button>
+      </div>
+    </div>
+
+    <div class="speed-indicator" id="speedIndicator">1×</div>
+  </div>
+
+  <!-- DEATH -->
+  <div class="screen" id="deathScreen">
+    <div class="death-content">
+      <span class="death-icon" id="deathIcon">🕯️</span>
+      <div class="death-title" id="deathTitle">Жизнь прожита</div>
+      <div class="death-sub" id="deathSub">—</div>
+      <div class="death-summary" id="deathSummary"></div>
+      <div class="compare-title">Рождённые в ту же секунду</div>
+      <div id="compareList"></div>
+      <div class="death-btns">
+        <button class="death-btn primary" id="newLifeBtn">🎲 Прожить ещё одну жизнь</button>
+        <button class="death-btn secondary" id="homeBtn">🏠 В начало</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============================================================
+   СТРАНЫ
+   ============================================================ */
+const COUNTRIES = [
+  { n:'Индия', f:'🇮🇳', pop:1440, br:16.9, le:70.8, im:27, gdp:8500, lit:76, region:'south_asian' },
+  { n:'Китай', f:'🇨🇳', pop:1410, br:6.4, le:78.6, im:6.8, gdp:23400, lit:97, region:'east_asian' },
+  { n:'Нигерия', f:'🇳🇬', pop:223, br:36, le:54.6, im:74, gdp:5300, lit:62, region:'african' },
+  { n:'Пакистан', f:'🇵🇰', pop:240, br:28, le:67.3, im:62, gdp:6400, lit:58, region:'south_asian' },
+  { n:'Индонезия', f:'🇮🇩', pop:277, br:16, le:71.9, im:21, gdp:13900, lit:96, region:'southeast_asian' },
+  { n:'США', f:'🇺🇸', pop:335, br:11, le:78.5, im:5.5, gdp:80000, lit:99, region:'north_american' },
+  { n:'Бразилия', f:'🇧🇷', pop:216, br:13, le:75.9, im:13, gdp:18000, lit:95, region:'latin_american' },
+  { n:'Бангладеш', f:'🇧🇩', pop:173, br:17, le:74.3, im:27, gdp:9000, lit:75, region:'south_asian' },
+  { n:'Россия', f:'🇷🇺', pop:144, br:9.6, le:72.6, im:5, gdp:36000, lit:99, region:'european' },
+  { n:'Мексика', f:'🇲🇽', pop:128, br:14, le:75.1, im:12, gdp:22000, lit:95, region:'latin_american' },
+  { n:'Эфиопия', f:'🇪🇹', pop:126, br:30, le:67.3, im:47, gdp:3500, lit:51, region:'african' },
+  { n:'Япония', f:'🇯🇵', pop:124, br:6.6, le:84.8, im:1.8, gdp:51000, lit:99, region:'east_asian' },
+  { n:'Германия', f:'🇩🇪', pop:84, br:9, le:81.2, im:3.2, gdp:63000, lit:99, region:'european' },
+  { n:'Великобритания', f:'🇬🇧', pop:68, br:10, le:81.3, im:4, gdp:55000, lit:99, region:'european' },
+  { n:'Франция', f:'🇫🇷', pop:65, br:10.6, le:82.9, im:3.7, gdp:56000, lit:99, region:'european' },
+  { n:'Италия', f:'🇮🇹', pop:59, br:6.7, le:83.5, im:2.9, gdp:54000, lit:99, region:'european' },
+  { n:'ЮАР', f:'🇿🇦', pop:60, br:19, le:65.3, im:28, gdp:16000, lit:95, region:'african' },
+  { n:'Вьетнам', f:'🇻🇳', pop:98, br:14, le:74.6, im:16, gdp:13000, lit:95, region:'southeast_asian' },
+  { n:'Турция', f:'🇹🇷', pop:85, br:14, le:78.6, im:9, gdp:40000, lit:96, region:'middle_eastern' },
+  { n:'Иран', f:'🇮🇷', pop:89, br:14, le:77.6, im:12, gdp:17000, lit:89, region:'middle_eastern' },
+  { n:'Таиланд', f:'🇹🇭', pop:72, br:9, le:80.0, im:7, gdp:21000, lit:94, region:'southeast_asian' },
+  { n:'Филиппины', f:'🇵🇭', pop:117, br:22, le:72.1, im:22, gdp:10000, lit:96, region:'southeast_asian' },
+  { n:'Египет', f:'🇪🇬', pop:112, br:22, le:70.2, im:19, gdp:15000, lit:71, region:'middle_eastern' },
+  { n:'ДР Конго', f:'🇨🇩', pop:99, br:42, le:59.7, im:70, gdp:1400, lit:77, region:'african' },
+  { n:'Кения', f:'🇰🇪', pop:55, br:27, le:63.7, im:34, gdp:5500, lit:82, region:'african' },
+  { n:'Аргентина', f:'🇦🇷', pop:46, br:13, le:77.7, im:9, gdp:26000, lit:99, region:'latin_american' },
+  { n:'Колумбия', f:'🇨🇴', pop:52, br:14, le:77.7, im:12, gdp:20000, lit:95, region:'latin_american' },
+  { n:'Испания', f:'🇪🇸', pop:48, br:7.6, le:83.9, im:2.7, gdp:48000, lit:98, region:'european' },
+  { n:'Польша', f:'🇵🇱', pop:38, br:8.9, le:78.6, im:3.9, gdp:43000, lit:99, region:'european' },
+  { n:'Австралия', f:'🇦🇺', pop:26, br:11.6, le:83.4, im:3.1, gdp:64000, lit:99, region:'north_american' },
+  { n:'Канада', f:'🇨🇦', pop:39, br:9.5, le:82.6, im:4.4, gdp:58000, lit:99, region:'north_american' },
+  { n:'Украина', f:'🇺🇦', pop:37, br:8, le:71, im:7, gdp:14000, lit:99, region:'european' },
+  { n:'Казахстан', f:'🇰🇿', pop:20, br:23, le:74, im:9, gdp:34000, lit:99, region:'european' },
+  { n:'Марокко', f:'🇲🇦', pop:38, br:17, le:74.6, im:18, gdp:10000, lit:79, region:'middle_eastern' },
+  { n:'Саудовская Аравия', f:'🇸🇦', pop:36, br:15, le:78.7, im:5.6, gdp:55000, lit:98, region:'middle_eastern' },
+  { n:'Малайзия', f:'🇲🇾', pop:34, br:14, le:76.6, im:7, gdp:33000, lit:95, region:'southeast_asian' }
+];
+
+const NAMES = {
+  south_asian: { m:['Арджун','Рахул','Викрам','Адитья','Рохан','Каран','Санджай','Ашок','Никхил','Раджеш'], f:['Прия','Аня','Дивья','Ниша','Кавита','Рия','Мира','Лакшми','Адити','Снеха'] },
+  east_asian: { m:['Вэй','Цзюнь','Мин','Хао','Лэй','Юки','Хиро','Рен','Кайто','Тао'], f:['Мэй','Лин','Сюэ','Юки','Ай','Хана','Сакура','Цзин','Янь','Мэйлин'] },
+  african: { m:['Кваме','Чинеду','Олу','Аде','Кофи','Мбарек','Табо','Джибрил','Обинна','Сифо'], f:['Амара','Нгози','Фатима','Зара','Аиша','Номса','Адеола','Мвана','Тендаи','Лумумба'] },
+  middle_eastern: { m:['Али','Омар','Хасан','Юсеф','Карим','Мехди','Рашид','Халид','Тарик','Фарид'], f:['Лейла','Фатима','Амира','Ясмин','Зейнаб','Марьям','Нур','Сальма','Рания','Далия'] },
+  european: { m:['Джон','Джеймс','Томас','Лукас','Макс','Пьер','Ханс','Иван','Александр','Даниэль'], f:['Эмма','Софи','Анна','Мария','Клара','Елена','Оливия','Шарлотта','Изабелла','Виктория'] },
+  latin_american: { m:['Диего','Карлос','Мигель','Хуан','Луис','Педро','Хавьер','Андрес','Мануэль','Рафаэль'], f:['Мария','София','Изабель','Кармен','Лусия','Андреа','Валентина','Камила','Габриэла','Паула'] },
+  north_american: { m:['Джек','Майкл','Дэвид','Крис','Райан','Тайлер','Брэндон','Ной','Итан','Логан'], f:['Джессика','Эшли','Эмили','Сара','Меган','Лорен','Рэйчел','Ханна','Мэдисон','Софи'] },
+  southeast_asian: { m:['Нгуен','Минь','Хоанг','Сомчай','Ади','Баю','Дева','Рисаль','Аунг','Кит'], f:['Линь','Май','Лан','Тхай','Ниса','Сри','Деви','Аю','Чандра','Кири'] }
+};
+
+/* ============================================================
+   ОБРАЗОВАНИЕ
+   ============================================================ */
+const EDUCATION = {
+  none:   { name:'Не учиться', em:'❌', years:0, cost:0, incomeMult:1, unlocked:true },
+  tech:   { name:'Техникум', em:'🔧', years:2, cost:200000, incomeMult:2.5, unlocked:true },
+  univ:   { name:'Университет', em:'🎓', years:4, cost:700000, incomeMult:4, unlocked:true },
+  elite:  { name:'Престижный вуз', em:'🏆', years:5, cost:1800000, incomeMult:7, unlocked:true },
+  abroad: { name:'За границей', em:'🌍', years:5, cost:4500000, incomeMult:12, unlocked:true }
+};
+
+/* ============================================================
+   КАРЬЕРА
+   ============================================================ */
+const CAREERS = {
+  unskilled: {
+    name:'Разнорабочий', em:'🔨', baseIncome:22000, growth:0.03,
+    reqEdu:['none','tech','univ','elite','abroad'],
+    reqRel:0, risk:0, special:null
+  },
+  worker: {
+    name:'Рабочий/техник', em:'⚙️', baseIncome:55000, growth:0.045,
+    reqEdu:['tech','univ','elite','abroad'],
+    reqRel:0, risk:0, special:null
+  },
+  office: {
+    name:'Офисный работник', em:'💼', baseIncome:110000, growth:0.055,
+    reqEdu:['univ','elite','abroad'],
+    reqRel:0, risk:0, special:null
+  },
+  top: {
+    name:'Топ-менеджер', em:'👔', baseIncome:280000, growth:0.075,
+    reqEdu:['elite','abroad'],
+    reqRel:0, risk:0, special:null
+  },
+  it: {
+    name:'IT-специалист', em:'💻', baseIncome:450000, growth:0.09,
+    reqEdu:['abroad','elite'],
+    reqRel:0, risk:0, special:null
+  },
+  entrepreneur: {
+    name:'Предприниматель', em:'🚀', baseIncome:0, growth:0.12,
+    reqEdu:['none','tech','univ','elite','abroad'],
+    reqRel:0, risk:0.15, special:'entrepreneur'
+  },
+  criminal: {
+    name:'Бандит', em:'🔫', baseIncome:300000, growth:0.10,
+    reqEdu:['none','tech','univ','elite','abroad'],
+    reqRel:0, risk:0.15, special:'criminal'
+  },
+  politics: {
+    name:'Политик', em:'🏛️', baseIncome:400000, growth:0.08,
+    reqEdu:['univ','elite','abroad'],
+    reqRel:65, risk:0.03, special:'politics'
+  }
+};
+
+/* ============================================================
+   КЛАСС / СТАТУС
+   ============================================================ */
+function getStatus(money, careerId, eduId){
+  if (careerId === 'criminal') return { name:'Бандит', em:'🔫', color:'#f87171' };
+  if (careerId === 'politics') return { name:'Политик', em:'🏛️', color:'#a855f7' };
+  if (careerId === 'entrepreneur' && money > 1000000) return { name:'Бизнесмен', em:'🚀', color:'#22d3ee' };
+
+  if (money < 0) return { name:'Должник', em:'📉', color:'#f87171' };
+  if (money < 10000) return { name:'Бомж', em:'🪙', color:'#7a7a95' };
+  if (money < 100000) return { name:'Бедный', em:'🥖', color:'#a0a0b8' };
+  if (money < 1000000) return { name:'Средний класс', em:'🏠', color:'#60a5fa' };
+  if (money < 10000000) return { name:'Зажиточный', em:'💰', color:'#fbbf24' };
+  if (money < 100000000) return { name:'Богатый', em:'💎', color:'#22d3ee' };
+  if (money < 1000000000) return { name:'Миллионер', em:'👑', color:'#a855f7' };
+  return { name:'Миллиардер', em:'💎✨', color:'#ffc440' };
+}
+
+/* ============================================================
+   ФОКУСЫ
+   ============================================================ */
+const FOCUSES = {
+  study:   { em:'🎓', name:'Учёба',    eff:{knowledge:8, happiness:-3} },
+  work:    { em:'💼', name:'Работа',   eff:{money:10000, health:-3, happiness:-2} },
+  health:  { em:'🏃', name:'Здоровье', eff:{health:8, happiness:2} },
+  family:  { em:'👨‍👩‍👧', name:'Семья',   eff:{relationships:8, happiness:4} },
+  rest:    { em:'🎉', name:'Отдых',    eff:{happiness:8, health:2, money:-3000} }
+};
+
+/* ============================================================
+   СОБЫТИЯ
+   ============================================================ */
+const EVENTS = [
+  { age:[1,2], icon:'👶', title:'Первые шаги', text:'Вы делаете свой первый шаг.',
+    choices:[
+      { text:'Шагнуть вперёд', eff:{happiness:5, relationships:3}, res:'Вы падаете, но смеётесь.' },
+      { text:'Заплакать', eff:{happiness:-2, relationships:2}, res:'Мама берёт на руки.' }
+    ]
+  },
+  { age:[6,8], icon:'🎒', title:'Первый класс', text:'Первый день в школе.',
+    choices:[
+      { text:'Завести друзей', eff:{relationships:8, happiness:5}, res:'Знакомитесь с классом.' },
+      { text:'Сидеть тихо', eff:{knowledge:6, relationships:-2}, res:'Внимательны, но одиноки.' }
+    ]
+  },
+  { age:[12,15], icon:'🎯', title:'Контрольная', text:'Можно списать.',
+    choices:[
+      { text:'Списать', eff:{knowledge:-3, happiness:3}, res:'Учитель не заметил.' },
+      { text:'Решить самому', eff:{knowledge:8, happiness:-3}, res:'Сложно, но честно.' }
+    ]
+  },
+  { age:[16,17], icon:'💔', title:'Влюблённость', text:'Признаться или нет?',
+    choices:[
+      { text:'Признаться', eff:{happiness:10, relationships:5}, res:'Взаимно!' },
+      { text:'Молчать', eff:{happiness:-3, knowledge:3}, res:'Держите в себе.' }
+    ]
+  },
+  { age:[28,35], icon:'👶', title:'Дети?', text:'Хотите ли вы завести ребёнка?',
+    choices:[
+      { text:'Да', eff:{happiness:15, relationships:10, money:-50000}, res:'Ребёнок родился!' },
+      { text:'Не сейчас', eff:{relationships:-5, money:10000}, res:'Пока не время.' }
+    ]
+  },
+  { age:[40,48], icon:'🩺', title:'Медосмотр', text:'Врач рекомендует проверить здоровье.',
+    choices:[
+      { text:'Пройти', eff:{health:12, money:-10000}, res:'Вовремя!' },
+      { text:'Отложить', eff:{health:-8}, res:'Надеемся, всё нормально.' }
+    ]
+  },
+  { age:[55,62], icon:'🌴', title:'Отпуск мечты', text:'Пора отдохнуть.',
+    choices:[
+      { text:'Поехать', eff:{happiness:15, health:5, money:-50000}, res:'Море, солнце.' },
+      { text:'Отложить', eff:{money:20000, happiness:-3}, res:'Копите дальше.' }
+    ]
+  },
+  { age:[65,80], icon:'💊', title:'Здоровье', text:'Проблемы со здоровьем.',
+    choices:[
+      { text:'Лечиться', eff:{health:10, money:-20000}, res:'Лекарства помогают.' },
+      { text:'Экономить', eff:{health:-15, money:10000}, res:'Экономия сейчас.' }
+    ]
+  }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let G = null;
+let yearTimer = null;
+let autoTimer = null;
+let paused = false;
+let speedMultiplier = 1;
+let speedIndex = 0;
+const SPEEDS = [1, 2, 4, 8, 16];
+let currentYearDuration = 60000;
+let currentTab = 'life';
+
+let settings = {
+  era: 'present',
+  mode: 'births',
+  duration: 3600
+};
+
+let meta = { totalLives: 0, totalBorn: 0, totalDied: 0 };
+const SAVE_KEY = 'one_in_8b_v3';
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function $(id){ return document.getElementById(id); }
+function rand(a, b){ return Math.floor(Math.random() * (b - a + 1)) + a; }
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function fmtMoney(n){
+  if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(1) + 'Б';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'М';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(0) + 'К';
+  return Math.round(n).toString();
+}
+
+function saveMeta(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(meta)); } catch(e){}
+}
+function loadMeta(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    meta.totalLives = d.totalLives || 0;
+    meta.totalBorn = d.totalBorn || 0;
+    meta.totalDied = d.totalDied || 0;
+  } catch(e){}
+}
+
+/* ============================================================
+   PICKERS
+   ============================================================ */
+function pickCountry(){
+  const key = settings.mode === 'births' ? 'br' : 'pop';
+  const total = COUNTRIES.reduce((s, c) => s + c[key], 0);
+  let r = Math.random() * total;
+  for (const c of COUNTRIES){
+    r -= c[key];
+    if (r <= 0) return c;
+  }
+  return COUNTRIES[0];
+}
+
+function pickName(country, sex){
+  const arr = NAMES[country.region] || NAMES.european;
+  return pick(sex === 'm' ? arr.m : arr.f);
+}
+
+/* ============================================================
+   PARTNER GENERATION
+   ============================================================ */
+function generatePartner(playerSex){
+  const oppSex = playerSex === 'm' ? 'f' : 'm';
+  const country = pickCountry();
+  const name = pickName(country, oppSex);
+
+  // Качества рандомно
+  const beauty = rand(20, 100);
+  const smart = rand(15, 100);
+  const character = rand(20, 100);
+  const incomeBase = country.gdp * (0.5 + Math.random() * 2);
+  const income = Math.round(incomeBase);
+
+  // Общий "балл" партнёра
+  const score = beauty * 0.3 + smart * 0.25 + character * 0.3 + Math.min(100, income / 1000) * 0.15;
+
+  return {
+    name, country, sex: oppSex,
+    beauty, smart, character, income,
+    love: 40 + Math.floor(Math.random() * 30), // 40-70
+    score,
+    metAt: 0
+  };
+}
+
+/* ============================================================
+   LIFE CREATION
+   ============================================================ */
+function newLife(){
+  const country = pickCountry();
+  const sex = Math.random() < 0.5 ? 'm' : 'f';
+  const name = pickName(country, sex);
+
+  const wealthRoll = Math.random();
+  let family;
+  if (wealthRoll < 0.15) family = 'poor';
+  else if (wealthRoll < 0.85) family = 'middle';
+  else family = 'rich';
+
+  const wealthBonus = family === 'rich' ? 15 : family === 'poor' ? -10 : 0;
+  const countryBonus = (country.gdp / 50000 - 0.3) * 20;
+
+  const healthBase = clamp(60 + countryBonus * 0.4 + wealthBonus * 0.5, 30, 90);
+  const happinessBase = clamp(55 + countryBonus * 0.3 + wealthBonus * 0.4, 25, 90);
+  const knowledgeBase = clamp(country.lit * 0.6 + wealthBonus * 0.5, 10, 80);
+  const relationshipsBase = clamp(55 + wealthBonus * 0.3, 30, 85);
+
+  const startMoney = family === 'rich' ? rand(50000, 200000) :
+                     family === 'middle' ? rand(1000, 20000) :
+                     rand(0, 1000);
+
+  const maxAge = Math.round(country.le + rand(-8, 12));
+
+  const siblings = [];
+  for (let i = 0; i < 4; i++){
+    const sc = pickCountry();
+    const sSex = Math.random() < 0.5 ? 'm' : 'f';
+    siblings.push({
+      name: pickName(sc, sSex),
+      country: sc,
+      sex: sSex,
+      maxAge: Math.round(sc.le + rand(-10, 15)),
+      currentAge: 0,
+      isDead: false,
+      deathAge: null
+    });
+  }
+
+  return {
+    name, country, sex, family,
+    age: 0,
+    health: healthBase,
+    happiness: happinessBase,
+    knowledge: knowledgeBase,
+    relationships: relationshipsBase,
+    money: startMoney,
+    focus: 'health',
+    log: [],
+    eventsSeen: new Set(),
+    isDead: false,
+    deathAge: 0,
+    maxAge,
+    siblings,
+    milestones: {},
+    // NEW:
+    education: null,      // 'none'|'tech'|'univ'|'elite'|'abroad'|null
+    eduYearsLeft: 0,
+    eduDebt: 0,
+    eduShown: false,      // показан ли выбор в 18
+    career: null,         // 'unskilled'|'worker'|...
+    careerYears: 0,
+    careerIncome: 0,
+    partner: null,
+    married: false,
+    children: 0,
+    inPrison: false,
+    prisonYearsLeft: 0
+  };
+}
+
+/* ============================================================
+   YEAR DURATION / SCHEDULE
+   ============================================================ */
+function calcYearDuration(life){
+  return (settings.duration * 1000) / life.maxAge;
+}
+
+function scheduleYear(){
+  if (yearTimer){ clearTimeout(yearTimer); yearTimer = null; }
+  if (!G || G.isDead || paused) return;
+  const dur = currentYearDuration / speedMultiplier;
+  yearTimer = setTimeout(() => {
+    if (!paused && G && !G.isDead) tickYear();
+  }, dur);
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+function startGame(){
+  G = newLife();
+  meta.totalLives++;
+  saveMeta();
+
+  $('setupScreen').classList.remove('active');
+  $('lifeScreen').classList.add('active');
+  $('deathScreen').classList.remove('active');
+  $('lifeLog').innerHTML = '';
+
+  paused = false;
+  speedMultiplier = 1;
+  speedIndex = 0;
+  $('speedBtn').textContent = '1×';
+  $('pauseBtn').textContent = '⏸';
+  $('pauseBtn').classList.remove('active');
+  $('autoBtn').classList.remove('active');
+
+  $('lifeFlag').textContent = G.country.f;
+  $('lifeName').textContent = G.name;
+  const famLabel = G.family === 'rich' ? 'богатая семья' : G.family === 'poor' ? 'бедная семья' : 'средний класс';
+  $('lifeMeta').textContent = `${G.country.n} · ${famLabel}`;
+
+  updateStats();
+  updateAge();
+  updateStatus();
+
+  addLog(0, `Вы родились в ${G.country.n} (${G.country.f}). ${G.sex === 'm' ? 'Мальчик' : 'Девочка'}. ${famLabel}.`, 'milestone');
+
+  updateFocusButtons();
+  updateNextButton();
+  switchTab('life');
+
+  currentYearDuration = calcYearDuration(G);
+  scheduleYear();
+}
+
+function endLife(){
+  if (yearTimer){ clearTimeout(yearTimer); yearTimer = null; }
+  if (autoTimer){ clearInterval(autoTimer); autoTimer = null; }
+}
+
+/* ============================================================
+   UPDATE UI
+   ============================================================ */
+function updateStats(){
+  $('valH').textContent = Math.round(G.health);
+  $('valS').textContent = Math.round(G.happiness);
+  $('valK').textContent = Math.round(G.knowledge);
+  $('valR').textContent = Math.round(G.relationships);
+  $('barH').style.transform = `scaleX(${G.health/100})`;
+  $('barS').style.transform = `scaleX(${G.happiness/100})`;
+  $('barK').style.transform = `scaleX(${G.knowledge/100})`;
+  $('barR').style.transform = `scaleX(${G.relationships/100})`;
+  $('moneyVal').textContent = fmtMoney(G.money) + ' ₽';
+}
+
+function updateAge(){
+  $('lifeAge').textContent = G.age;
+}
+
+function updateStatus(){
+  const st = getStatus(G.money, G.career, G.education);
+  const tag = $('statusTag');
+  tag.textContent = `${st.em} ${st.name}`;
+  tag.style.color = st.color;
+}
+
+function updateFocusButtons(){
+  document.querySelectorAll('.focus-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.focus === G.focus);
+    b.disabled = G.age < 3;
+  });
+}
+
+function updateNextButton(){
+  const btn = $('nextYearBtn');
+  if (!btn) return;
+  btn.disabled = G.age >= G.maxAge || paused;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.life-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  });
+  if (tab === 'relations') renderRelations();
+  if (tab === 'career') renderCareer();
+}
+
+document.querySelectorAll('.life-tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+
+/* ============================================================
+   RELATIONS RENDER
+   ============================================================ */
+function renderRelations(){
+  const c = $('relationsContent');
+  if (G.age < 16){
+    c.innerHTML = `<div class="empty-state"><span class="em">💕</span>Отношения появятся ближе к 16 годам.</div>`;
+    return;
+  }
+
+  if (!G.partner){
+    c.innerHTML = `
+      <div class="panel-card">
+        <div class="panel-title">💕 Одиноки</div>
+        <div style="text-align:center;padding:12px 0;">
+          <div style="font-size:44px;margin-bottom:8px;">💔</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;">У вас пока нет партнёра. Найдите того, кто подойдёт.</div>
+          <button class="action-btn primary" id="findPartnerBtn" style="width:100%;">
+            <span class="em">🔍</span><span>Найти партнёра</span>
+          </button>
+        </div>
+      </div>
+    `;
+    const btn = $('findPartnerBtn');
+    if (btn) btn.addEventListener('click', findPartner);
+    return;
+  }
+
+  const p = G.partner;
+  const lovePct = Math.round(p.love);
+  const statusText = G.married ? '💍 В браке' : '💕 Встречаетесь';
+
+  c.innerHTML = `
+    <div class="panel-card">
+      <div class="panel-title">${statusText}</div>
+      <div class="partner-head">
+        <div class="partner-avatar" style="--pc:${p.sex==='m'?'#60a5fa':'#ec4899'}">
+          ${p.sex === 'm' ? '👨' : '👩'}
+        </div>
+        <div class="partner-info">
+          <div class="partner-name">${p.name}</div>
+          <div class="partner-sub">${p.country.f} ${p.country.n} · ${p.income > 200000 ? 'обеспеченный' : p.income > 50000 ? 'средний доход' : 'невысокий доход'}</div>
+        </div>
+      </div>
+
+      <div class="stat-row"><span class="k">💄 Красота</span><span class="v">${p.beauty}</span></div>
+      <div class="stat-row"><span class="k">🧠 Ум</span><span class="v">${p.smart}</span></div>
+      <div class="stat-row"><span class="k">😊 Характер</span><span class="v">${p.character}</span></div>
+      <div class="stat-row"><span class="k">💰 Доход</span><span class="v">${fmtMoney(p.income)} ₽/год</span></div>
+
+      <div style="margin-top:8px;font-size:10px;color:var(--muted);font-weight:800;">❤️ Любовь</div>
+      <div class="love-bar"><div class="love-fill" style="transform:scaleX(${lovePct/100})"></div></div>
+      <div style="font-size:9px;color:var(--muted);text-align:right;font-weight:700;">${lovePct}%</div>
+
+      <div class="action-grid">
+        ${!G.married ? `<button class="action-btn success" data-act="marry"><span class="em">💍</span><span>Жениться</span></button>` : ''}
+        <button class="action-btn secondary" data-act="date"><span class="em">💐</span><span>Свидание</span></button>
+        <button class="action-btn danger" data-act="breakup"><span class="em">💔</span><span>${G.married ? 'Развестись' : 'Расстаться'}</span></button>
+      </div>
+
+      ${G.children > 0 ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(96,165,250,.1);border-radius:8px;font-size:11px;color:#a8d4ff;font-weight:700;text-align:center;">👶 Детей: ${G.children}</div>` : ''}
+    </div>
+  `;
+
+  c.querySelectorAll('[data-act]').forEach(b => {
+    b.addEventListener('click', () => handleRelationAction(b.dataset.act));
+  });
+}
+
+function findPartner(){
+  paused = true;
+  if (yearTimer) clearTimeout(yearTimer);
+
+  // Generate 3 options
+  const options = [];
+  for (let i = 0; i < 3; i++){
+    options.push(generatePartner(G.sex));
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="modal-icon">💕</span>
+        <span class="modal-title">Кандидаты</span>
+      </div>
+      <div class="modal-text">Выберите того, кто вам больше по душе:</div>
+      <div class="modal-choices">
+        ${options.map((p, i) => `
+          <button class="partner-choice" data-i="${i}">
+            <div class="pc-head">
+              <div class="pc-av" style="--pc:${p.sex==='m'?'#60a5fa':'#ec4899'}">
+                ${p.sex === 'm' ? '👨' : '👩'}
+              </div>
+              <div>
+                <div class="pc-name">${p.name}</div>
+                <div style="font-size:9px;color:var(--muted);margin-top:1px;">${p.country.f} ${p.country.n}</div>
+              </div>
+            </div>
+            <div class="pc-stats">
+              <span>💄 ${p.beauty}</span>
+              <span>🧠 ${p.smart}</span>
+              <span>😊 ${p.character}</span>
+              <span class="st">💰 ${fmtMoney(p.income)}/год</span>
+            </div>
+          </button>
+        `).join('')}
+        <button class="choice-btn" id="cancelFind" style="text-align:center;margin-top:4px;">Отмена</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('app').appendChild(overlay);
+
+  overlay.querySelectorAll('.partner-choice').forEach((b, i) => {
+    b.addEventListener('click', () => {
+      G.partner = options[i];
+      G.partner.metAt = G.age;
+      G.happiness = clamp(G.happiness + 15, 0, 100);
+      overlay.remove();
+      addLog(G.age, `💕 Вы познакомились с ${G.partner.name} из ${G.partner.country.n}.`, 'good');
+      paused = false;
+      updateNextButton();
+      renderRelations();
+      scheduleYear();
+    });
+  });
+
+  $('cancelFind').addEventListener('click', () => {
+    overlay.remove();
+    paused = false;
+    updateNextButton();
+    scheduleYear();
+  });
+}
+
+function handleRelationAction(act){
+  const p = G.partner;
+  if (!p) return;
+
+  if (act === 'date'){
+    p.love = clamp(p.love + rand(5, 15), 0, 100);
+    G.happiness = clamp(G.happiness + 5, 0, 100);
+    G.money -= rand(500, 5000);
+    addLog(G.age, `💐 Свидание с ${p.name}. Любовь: ${p.love}%`, 'good');
+    updateStats();
+    renderRelations();
+    return;
+  }
+
+  if (act === 'marry'){
+    if (p.love < 60){
+      toast('❤️ Слишком мало любви — нужно минимум 60%');
+      return;
+    }
+    G.married = true;
+    G.money -= rand(20000, 100000);
+    G.happiness = clamp(G.happiness + 15, 0, 100);
+    addLog(G.age, `💍 Вы женились на ${p.name}!`, 'milestone');
+    updateStats();
+    renderRelations();
+    return;
+  }
+
+  if (act === 'breakup'){
+    if (G.married){
+      G.money -= Math.floor(G.money * 0.3);
+      addLog(G.age, `💔 Развод с ${p.name}. Потеряна часть имущества.`, 'bad');
+    } else {
+      addLog(G.age, `💔 Вы расстались с ${p.name}.`, 'bad');
+    }
+    G.happiness = clamp(G.happiness - 10, 0, 100);
+    G.partner = null;
+    G.married = false;
+    renderRelations();
+    updateStats();
+  }
+}
+
+/* ============================================================
+   CAREER RENDER
+   ============================================================ */
+function renderCareer(){
+  const c = $('careerContent');
+
+  // Education section
+  let eduHtml = '';
+  if (!G.education){
+    eduHtml = `
+      <div class="panel-card">
+        <div class="panel-title">🎓 Образование</div>
+        <div style="text-align:center;padding:8px 0;font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;">
+          ${G.age < 18 ? `До выбора образования ещё ${18 - G.age} лет` : 'Выберите образование в 18 лет'}
+        </div>
+      </div>
+    `;
+  } else {
+    const edu = EDUCATION[G.education];
+    eduHtml = `
+      <div class="panel-card">
+        <div class="panel-title">🎓 Образование</div>
+        <div class="stat-row"><span class="k">${edu.em} Статус</span><span class="v">${G.eduYearsLeft > 0 ? `Учится (${G.eduYearsLeft} г.)` : 'Завершено'}</span></div>
+        <div class="stat-row"><span class="k">🎯 Специальность</span><span class="v">${edu.name}</span></div>
+        ${G.eduDebt > 0 ? `<div class="stat-row"><span class="k">💸 Долг за учёбу</span><span class="v" style="color:var(--red)">${fmtMoney(G.eduDebt)} ₽</span></div>` : ''}
+      </div>
+    `;
+  }
+
+  // Career section
+  let careerHtml = '';
+  if (!G.career){
+    careerHtml = `
+      <div class="panel-card">
+        <div class="panel-title">💼 Карьера</div>
+        <div style="text-align:center;padding:8px 0;font-size:11px;color:var(--muted);margin-bottom:8px;">
+          ${G.age < 18 ? `До карьеры ещё ${18 - G.age} лет` : 'Выберите карьерный путь'}
+        </div>
+        ${G.age >= 18 && G.education ? '<button class="career-option" id="pickCareerBtn"><span class="co-em">📋</span><div class="co-info"><div class="co-name">Выбрать карьеру</div><div class="co-desc">Доступные пути для вашего образования</div></div></button>' : ''}
+      </div>
+    `;
+  } else {
+    const car = CAREERS[G.career];
+    const income = Math.round(G.careerIncome);
+    careerHtml = `
+      <div class="panel-card">
+        <div class="panel-title">💼 Текущая карьера</div>
+        <div class="career-option current">
+          <span class="co-em">${car.em}</span>
+          <div class="co-info">
+            <div class="co-name">${car.name}</div>
+            <div class="co-desc">Опыт: ${G.careerYears} лет ${G.inPrison ? '· 🚔 В тюрьме' : ''}</div>
+          </div>
+          <div class="co-income">${fmtMoney(income)}/г</div>
+        </div>
+        <button class="action-btn secondary" id="changeCareerBtn" style="width:100%;margin-top:8px;">
+          <span class="em">🔄</span><span>Сменить карьеру</span>
+        </button>
+      </div>
+    `;
+  }
+
+  c.innerHTML = eduHtml + careerHtml;
+  updateStatus();
+
+  const pickBtn = $('pickCareerBtn');
+  if (pickBtn) pickBtn.addEventListener('click', showCareerChoice);
+
+  const changeBtn = $('changeCareerBtn');
+  if (changeBtn) changeBtn.addEventListener('click', () => {
+    if (!confirm('Смена карьеры обнулит опыт. Продолжить?')) return;
+    G.career = null;
+    G.careerYears = 0;
+    G.careerIncome = 0;
+    renderCareer();
+  });
+}
+
+/* ============================================================
+   EDUCATION CHOICE (at 18)
+   ============================================================ */
+function showEducationChoice(){
+  paused = true;
+  if (yearTimer) clearTimeout(yearTimer);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="modal-icon">🎓</span>
+        <span class="modal-title">18 лет · Выбор образования</span>
+      </div>
+      <div class="modal-text">Куда пойти учиться? От этого зависит потолок вашей карьеры.</div>
+      <div class="modal-choices">
+        ${Object.entries(EDUCATION).map(([id, e]) => `
+          <button class="edu-card" data-edu="${id}">
+            <div class="edu-head">
+              <span class="edu-em">${e.em}</span>
+              <span class="edu-name">${e.name}</span>
+              ${e.cost > 0 ? `<span class="edu-cost">${fmtMoney(e.cost)} ₽</span>` : '<span class="edu-cost" style="color:var(--green)">Бесплатно</span>'}
+            </div>
+            <div class="edu-details">
+              ${e.years > 0 ? `⏱ ${e.years} лет · ` : ''}
+              💼 Умнож. дохода ×${e.incomeMult}
+              ${e.cost > 0 && G.money < e.cost ? ' · 💸 в кредит' : ''}
+            </div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('app').appendChild(overlay);
+
+  overlay.querySelectorAll('.edu-card').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.edu;
+      const e = EDUCATION[id];
+      G.education = id;
+      if (e.years > 0){
+        G.eduYearsLeft = e.years;
+        if (e.cost > 0){
+          if (G.money >= e.cost){
+            G.money -= e.cost;
+          } else {
+            G.eduDebt += e.cost;
+            G.money -= Math.floor(e.cost * 0.1); // первый взнос
+          }
+        }
+        addLog(18, `🎓 Поступили: ${e.name}. ${e.years} лет учёбы.`, 'milestone');
+      } else {
+        addLog(18, `❌ Решили не учиться. Сразу в работу.`, 'milestone');
+      }
+      overlay.remove();
+      paused = false;
+      updateNextButton();
+      updateStatus();
+      scheduleYear();
+    });
+  });
+}
+
+/* ============================================================
+   CAREER CHOICE
+   ============================================================ */
+function showCareerChoice(){
+  paused = true;
+  if (yearTimer) clearTimeout(yearTimer);
+
+  const available = Object.entries(CAREERS).filter(([id, c]) => {
+    if (!c.reqEdu.includes(G.education)) return false;
+    if (G.relationships < c.reqRel) return false;
+    return true;
+  });
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="modal-icon">💼</span>
+        <span class="modal-title">Выбор карьеры</span>
+      </div>
+      <div class="modal-text">Каждое ремесло — свой путь. Одни дают стабильность, другие риск.</div>
+      <div class="modal-choices">
+        ${available.map(([id, c]) => `
+          <button class="career-option" data-car="${id}">
+            <span class="co-em">${c.em}</span>
+            <div class="co-info">
+              <div class="co-name">${c.name}</div>
+              <div class="co-desc">
+                ${c.special === 'entrepreneur' ? 'Нестабильный доход · риск банкротства' :
+                  c.special === 'criminal' ? 'Высокий доход · риск тюрьмы' :
+                  c.special === 'politics' ? 'Нужны связи · высокий доход' :
+                  'Стабильный доход с ростом'}
+              </div>
+            </div>
+            <div class="co-income">~${fmtMoney(c.baseIncome)}/г</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('app').appendChild(overlay);
+
+  overlay.querySelectorAll('[data-car]').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.car;
+      G.career = id;
+      G.careerYears = 0;
+      G.careerIncome = CAREERS[id].baseIncome;
+      addLog(G.age, `${CAREERS[id].em} Вы стали: ${CAREERS[id].name}.`, 'milestone');
+      overlay.remove();
+      paused = false;
+      updateNextButton();
+      updateStatus();
+      renderCareer();
+      scheduleYear();
+    });
+  });
+}
+
+/* ============================================================
+   TICK YEAR
+   ============================================================ */
+function tickYear(){
+  if (!G || G.isDead || paused) return;
+
+  // Apply focus
+  if (G.age >= 3){
+    const f = FOCUSES[G.focus];
+    if (f.eff.health) G.health += f.eff.health;
+    if (f.eff.happiness) G.happiness += f.eff.happiness;
+    if (f.eff.knowledge) G.knowledge += f.eff.knowledge;
+    if (f.eff.relationships) G.relationships += f.eff.relationships;
+    if (f.eff.money) G.money += f.eff.money;
+  }
+
+  // Education year
+  if (G.eduYearsLeft > 0){
+    G.eduYearsLeft--;
+    G.knowledge += 4;
+    if (G.eduYearsLeft === 0){
+      addLog(G.age, `🎓 Образование завершено! Теперь можно выбрать карьеру.`, 'milestone');
+    }
+  }
+
+  // Career income
+  if (G.career && !G.inPrison){
+    const c = CAREERS[G.career];
+    const growthMult = 1 + G.careerYears * c.growth;
+    let income = c.baseIncome * growthMult * (G.education ? EDUCATION[G.education].incomeMult : 1);
+
+    if (c.special === 'entrepreneur'){
+      // Random income
+      const r = Math.random();
+      if (r < 0.25){ income = 0; addLog(G.age, `💼 Бизнес прогорел в этом году.`, 'bad'); }
+      else if (r > 0.9){ income *= 5; addLog(G.age, `💼 Бизнес выстрелил! ×5 доход.`, 'good'); }
+    }
+
+    if (c.special === 'criminal' && Math.random() < c.risk){
+      // Prison
+      G.inPrison = true;
+      G.prisonYearsLeft = rand(3, 8);
+      G.money = Math.floor(G.money * 0.3);
+      addLog(G.age, `🚔 Поймали! ${G.prisonYearsLeft} лет тюрьмы. Деньги конфискованы.`, 'bad');
+      G.happiness = clamp(G.happiness - 25, 0, 100);
+      income = 0;
+    }
+
+    if (c.special === 'politics' && Math.random() < c.risk){
+      addLog(G.age, `🏛️ Скандал в прессе. Репутация пострадала.`, 'bad');
+      G.relationships = clamp(G.relationships - 15, 0, 100);
+    }
+
+    G.careerIncome = Math.max(0, income);
+    G.money += income;
+    G.careerYears++;
+  }
+
+  // Prison
+  if (G.inPrison){
+    G.prisonYearsLeft--;
+    if (G.prisonYearsLeft <= 0){
+      G.inPrison = false;
+      G.career = null;
+      G.careerYears = 0;
+      G.careerIncome = 0;
+      addLog(G.age, `🚪 Вы вышли из тюрьмы. Придётся начинать заново.`, 'milestone');
+    } else {
+      G.happiness = clamp(G.happiness - 3, 0, 100);
+      G.health = clamp(G.health - 2, 0, 100);
+    }
+  }
+
+  // Expenses
+  let expenses = 5000 + G.age * 100;
+  if (G.married) expenses += 15000;
+  expenses += G.children * 25000;
+  if (G.family === 'rich') expenses *= 1.5;
+  G.money -= expenses;
+
+  // Partner income + love decay
+  if (G.partner){
+    G.money += G.partner.income * 0.3;
+    // Love decay
+    let decay = 1 + (100 - G.partner.character) * 0.05;
+    if (G.married) decay *= 1.5;
+    G.partner.love = clamp(G.partner.love - decay, 0, 100);
+
+    // Partner might leave
+    if (G.partner.love < 15 && Math.random() < 0.3){
+      addLog(G.age, `💔 ${G.partner.name} ушёл/ушла от вас.`, 'bad');
+      G.partner = null;
+      G.married = false;
+      G.happiness = clamp(G.happiness - 20, 0, 100);
+    }
+  }
+
+  // Children random birth
+  if (G.married && G.children < 4 && G.age < 45 && Math.random() < 0.08){
+    G.children++;
+    G.happiness = clamp(G.happiness + 10, 0, 100);
+    addLog(G.age, `👶 У вас родился ${G.children === 1 ? 'первый' : (G.children + '-й')} ребёнок!`, 'milestone');
+  }
+
+  // Aging
+  if (G.age > 40) G.health -= (G.age - 40) * 0.08;
+  if (G.age > 60) G.health -= (G.age - 60) * 0.15;
+
+  G.health = clamp(G.health, 0, 100);
+  G.happiness = clamp(G.happiness, 0, 100);
+  G.knowledge = clamp(G.knowledge, 0, 100);
+  G.relationships = clamp(G.relationships, 0, 100);
+
+  G.age++;
+
+  // Advance siblings
+  for (const s of G.siblings){
+    if (s.isDead) continue;
+    s.currentAge++;
+    let risk = 0.001;
+    if (s.currentAge >= s.maxAge) risk = 1;
+    else if (s.currentAge > 60) risk = 0.02 + (s.currentAge - 60) * 0.005;
+    else if (s.currentAge > 40) risk = 0.004;
+    if (Math.random() < risk){
+      s.isDead = true;
+      s.deathAge = s.currentAge;
+    }
+  }
+
+  addLog(G.age, getAgeLog(G.age), 'good');
+
+  // Show education choice at 18
+  if (G.age === 18 && !G.education && !G.eduShown){
+    G.eduShown = true;
+    setTimeout(() => showEducationChoice(), 300);
+  }
+
+  // Milestone question
+  if ([5, 15, 30, 50, 70].includes(G.age) && !G.milestones[G.age]){
+    G.milestones[G.age] = true;
+    setTimeout(() => showQuestion(G.age), 200);
+  }
+
+  if (checkDeath()){ die(); return; }
+
+  maybeEvent();
+
+  updateStats();
+  updateAge();
+  updateStatus();
+  updateFocusButtons();
+  updateNextButton();
+
+  if (currentTab === 'relations') renderRelations();
+  if (currentTab === 'career') renderCareer();
+
+  scheduleYear();
+}
+
+/* ============================================================
+   AGE LOG
+   ============================================================ */
+function getAgeLog(age){
+  if (age <= 1) return pick(['Учитесь ходить.', 'Первый зуб.']);
+  if (age <= 3) return pick(['Детский сад.', 'Любите мультики.']);
+  if (age <= 5) return pick(['Играете во дворе.', 'Учитесь читать.']);
+  if (age <= 10) return pick(['Школа. Домашка.', 'Нашли друга.', 'Лето, речка, велосипед.']);
+  if (age <= 14) return pick(['Подростковый возраст.', 'Первые ссоры.']);
+  if (age <= 18) return pick(['Экзамены. Нервы.', 'Выпускной.', 'Первая любовь.']);
+  if (age <= 25) return pick(['Поиск себя.', 'Первые деньги.', 'Вечеринки.']);
+  if (age <= 35) return pick(['Карьера набирает обороты.', 'Семейные заботы.', 'Кредиты и планы.']);
+  if (age <= 45) return pick(['Стабильность.', 'Дети растут.', 'Планы на будущее.']);
+  if (age <= 55) return pick(['Кризис среднего возраста.', 'Дети выросли.', 'Больше времени для себя.']);
+  if (age <= 65) return pick(['Подготовка к пенсии.', 'Внуки.', 'Дача и огород.']);
+  if (age <= 75) return pick(['Пенсия.', 'Здоровье — главное.', 'Долгие прогулки.']);
+  return pick(['Каждый день — подарок.', 'Тишина и покой.', 'Внуки звонят по выходным.']);
+}
+
+/* ============================================================
+   DEATH
+   ============================================================ */
+function checkDeath(){
+  if (G.age >= G.maxAge) return true;
+
+  const age = G.age;
+  const im = G.country.im / 1000;
+  let risk = 0;
+  if (age === 0) risk = im * 2;
+  else if (age < 5) risk = im * 0.5;
+  else if (age < 15) risk = 0.001;
+  else if (age < 40) risk = 0.0015 + (age - 15) * 0.0001;
+  else if (age < 60) risk = 0.004 + (age - 40) * 0.0008;
+  else if (age < 75) risk = 0.02 + (age - 60) * 0.003;
+  else if (age < 85) risk = 0.08 + (age - 75) * 0.015;
+  else risk = 0.25 + (age - 85) * 0.05;
+
+  if (G.health < 30) risk *= 2;
+  if (G.health < 15) risk *= 3;
+  if (G.family === 'rich') risk *= 0.85;
+
+  return Math.random() < risk;
+}
+
+function die(){
+  G.isDead = true;
+  G.deathAge = G.age;
+  meta.totalDied++;
+  saveMeta();
+  endLife();
+  addLog(G.age, `💀 Вы умерли в возрасте ${G.age} лет.`, 'death');
+  setTimeout(showDeathScreen, 1200);
+}
+
+function showDeathScreen(){
+  $('lifeScreen').classList.remove('active');
+  $('deathScreen').classList.add('active');
+
+  const icons = ['🕯️','🌹','🕊️','⚰️','🌙'];
+  $('deathIcon').textContent = pick(icons);
+
+  const year = 2026 - G.deathAge;
+  const title = G.deathAge < 18 ? 'Жизнь оборвалась рано' :
+    G.deathAge < 60 ? 'Жизнь прожита' : G.deathAge < 85 ? 'Долгая жизнь' : 'Долгожитель';
+  $('deathTitle').textContent = title;
+  $('deathSub').textContent = `${G.name}, ${G.country.f} ${G.country.n} · ${year} — 2026`;
+
+  const status = getStatus(G.money, G.career, G.education);
+  const eduName = G.education ? EDUCATION[G.education].name : 'без образования';
+  const carName = G.career ? CAREERS[G.career].name : 'без карьеры';
+
+  $('deathSummary').innerHTML = `
+    <div class="sum-row"><span class="k">Возраст смерти</span><span class="v">${G.deathAge} лет</span></div>
+    <div class="sum-row"><span class="k">Страна</span><span class="v">${G.country.f} ${G.country.n}</span></div>
+    <div class="sum-row"><span class="k">Семья</span><span class="v">${G.family === 'rich' ? 'Богатая' : G.family === 'poor' ? 'Бедная' : 'Средний класс'}</span></div>
+    <div class="sum-row"><span class="k">Образование</span><span class="v">${eduName}</span></div>
+    <div class="sum-row"><span class="k">Карьера</span><span class="v">${carName}</span></div>
+    <div class="sum-row"><span class="k">Дети</span><span class="v">${G.children}</span></div>
+    <div class="sum-row"><span class="k">Статус</span><span class="v" style="color:${status.color}">${status.em} ${status.name}</span></div>
+    <div class="sum-row"><span class="k">Накопления</span><span class="v gold">${fmtMoney(G.money)} ₽</span></div>
+    <div class="final-stats">
+      <div class="fs-box"><div class="em">❤️</div><div class="n">${Math.round(G.health)}</div><div class="l">Здоровье</div></div>
+      <div class="fs-box"><div class="em">😊</div><div class="n">${Math.round(G.happiness)}</div><div class="l">Счастье</div></div>
+      <div class="fs-box"><div class="em">📚</div><div class="n">${Math.round(G.knowledge)}</div><div class="l">Знания</div></div>
+      <div class="fs-box"><div class="em">👥</div><div class="n">${Math.round(G.relationships)}</div><div class="l">Отношения</div></div>
+    </div>
+  `;
+
+  let cmp = `
+    <div class="compare-item me">
+      <span class="cf">${G.country.f}</span>
+      <div class="ci">
+        <div class="cn">${G.name} (вы)</div>
+        <div class="cm">${G.country.n} · ${status.name}</div>
+      </div>
+      <span class="ca">${G.deathAge}</span>
+    </div>
+  `;
+  for (const s of G.siblings){
+    const age = s.isDead ? s.deathAge : s.currentAge;
+    cmp += `
+      <div class="compare-item">
+        <span class="cf">${s.country.f}</span>
+        <div class="ci">
+          <div class="cn">${s.name}${s.isDead ? ' †' : ''}</div>
+          <div class="cm">${s.country.n}</div>
+        </div>
+        <span class="ca">${age}</span>
+      </div>
+    `;
+  }
+  $('compareList').innerHTML = cmp;
+}
+
+/* ============================================================
+   LOG
+   ============================================================ */
+function addLog(age, text, type){
+  if (!text) return;
+  const logEl = $('lifeLog');
+  const item = document.createElement('div');
+  item.className = 'log-item' + (type ? ' ' + type : '');
+  item.innerHTML = `<div class="age">${age} лет</div>${text}`;
+  logEl.appendChild(item);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+function maybeEvent(){
+  const eligible = EVENTS.filter(e =>
+    G.age >= e.age[0] && G.age <= e.age[1] && !G.eventsSeen.has(e.title)
+  );
+  if (eligible.length === 0) return;
+  if (Math.random() > 0.5) return;
+  const event = pick(eligible);
+  G.eventsSeen.add(event.title);
+  showEventModal(event);
+}
+
+function showEventModal(event){
+  paused = true;
+  if (yearTimer) clearTimeout(yearTimer);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="modal-icon">${event.icon}</span>
+        <span class="modal-title">Событие · ${G.age} лет</span>
+      </div>
+      <div class="modal-text">${event.text}</div>
+      <div class="modal-choices">
+        ${event.choices.map((c, i) => `<button class="choice-btn" data-i="${i}">${c.text}</button>`).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('app').appendChild(overlay);
+
+  overlay.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const choice = event.choices[parseInt(btn.dataset.i)];
+      overlay.remove();
+      applyEventResult(event, choice);
+      paused = false;
+      updateNextButton();
+      scheduleYear();
+    });
+  });
+}
+
+function applyEventResult(event, choice){
+  const eff = choice.eff;
+  if (eff.health) G.health += eff.health;
+  if (eff.happiness) G.happiness += eff.happiness;
+  if (eff.knowledge) G.knowledge += eff.knowledge;
+  if (eff.relationships) G.relationships += eff.relationships;
+  if (eff.money) G.money += eff.money;
+
+  G.health = clamp(G.health, 0, 100);
+  G.happiness = clamp(G.happiness, 0, 100);
+  G.knowledge = clamp(G.knowledge, 0, 100);
+  G.relationships = clamp(G.relationships, 0, 100);
+
+  const isBad = (eff.health || 0) < 0 || (eff.happiness || 0) < 0;
+  addLog(G.age, `${event.icon} ${event.text} → ${choice.res}`, isBad ? 'bad' : 'event');
+  updateStats();
+}
+
+/* ============================================================
+   QUESTION
+   ============================================================ */
+function showQuestion(age){
+  paused = true;
+  if (yearTimer) clearTimeout(yearTimer);
+
+  const qs = {
+    5: 'Что для вас сейчас самое важное?',
+    15: 'Кем вы себя видите через 10 лет?',
+    30: 'Что вы цените больше всего в жизни?',
+    50: 'О чём вы жалеете и чему рады?',
+    70: 'Что бы вы сказали себе в 20 лет?'
+  };
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="question-card">
+      <div class="question-label">Вам ${age} лет</div>
+      <div class="question-text">${qs[age]}</div>
+      <textarea class="question-input" id="qIn" placeholder="Напишите пару строк..." rows="3"></textarea>
+      <div class="question-actions">
+        <button class="btn-skip" id="qSkip">Пропустить</button>
+        <button class="btn-submit" id="qSub">Записать</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('app').appendChild(overlay);
+
+  const inp = $('qIn');
+  inp.focus();
+
+  const finish = (text) => {
+    overlay.remove();
+    if (text && text.trim()){
+      addLog(age, `📝 «${text.trim()}»`, 'milestone');
+    } else {
+      addLog(age, `🤔 Вы задумались о жизни...`, 'milestone');
+    }
+    paused = false;
+    updateNextButton();
+    scheduleYear();
+  };
+
+  $('qSkip').addEventListener('click', () => finish(null));
+  $('qSub').addEventListener('click', () => finish(inp.value));
+}
+
+/* ============================================================
+   UI BINDINGS
+   ============================================================ */
+$('birthBtn').addEventListener('click', () => startGame());
+
+document.querySelectorAll('#eraOptions .setup-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#eraOptions .setup-opt').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    settings.era = b.dataset.era;
+  });
+});
+
+document.querySelectorAll('#modeOptions .setup-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#modeOptions .setup-opt').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    settings.mode = b.dataset.mode;
+  });
+});
+
+document.querySelectorAll('#durationOptions .setup-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#durationOptions .setup-opt').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    settings.duration = parseInt(b.dataset.duration);
+  });
+});
+
+document.querySelectorAll('.focus-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    if (!G || G.age < 3) return;
+    G.focus = b.dataset.focus;
+    updateFocusButtons();
+  });
+});
+
+$('nextYearBtn').addEventListener('click', () => {
+  if (G && !G.isDead) tickYear();
+});
+
+$('pauseBtn').addEventListener('click', () => {
+  paused = !paused;
+  $('pauseBtn').textContent = paused ? '▶' : '⏸';
+  $('pauseBtn').classList.toggle('active', paused);
+  updateNextButton();
+  if (paused){
+    if (yearTimer) clearTimeout(yearTimer);
+  } else {
+    scheduleYear();
+  }
+});
+
+$('speedBtn').addEventListener('click', () => {
+  speedIndex = (speedIndex + 1) % SPEEDS.length;
+  speedMultiplier = SPEEDS[speedIndex];
+  $('speedBtn').textContent = speedMultiplier + '×';
+  const ind = $('speedIndicator');
+  ind.textContent = speedMultiplier + '×';
+  ind.classList.add('show');
+  setTimeout(() => ind.classList.remove('show'), 800);
+  if (!paused) scheduleYear();
+});
+
+$('autoBtn').addEventListener('click', () => {
+  if (autoTimer){
+    clearInterval(autoTimer);
+    autoTimer = null;
+    $('autoBtn').classList.remove('active');
+    paused = false;
+    updateNextButton();
+    scheduleYear();
+  } else {
+    if (yearTimer) clearTimeout(yearTimer);
+    paused = false;
+    $('autoBtn').classList.add('active');
+    autoTimer = setInterval(() => {
+      if (G && !G.isDead && !paused) tickYear();
+    }, 1200);
+    updateNextButton();
+  }
+});
+
+$('newLifeBtn').addEventListener('click', () => {
+  $('deathScreen').classList.remove('active');
+  $('setupScreen').classList.add('active');
+});
+
+$('homeBtn').addEventListener('click', () => {
+  $('deathScreen').classList.remove('active');
+  $('setupScreen').classList.add('active');
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init(){
+  loadMeta();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden){ if (yearTimer) clearTimeout(yearTimer); }
+    else if (G && !G.isDead && !paused) scheduleYear();
+  });
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
